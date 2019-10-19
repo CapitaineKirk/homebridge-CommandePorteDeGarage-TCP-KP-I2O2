@@ -1,22 +1,13 @@
-{
-    "bridge": {
-        "name": "Maison",
-        "username": "03:05:01:C1:C3:09",
-        "port": 51827,
-        "pin": "031-45-155"
-    },
-
-    "description": "This is an example configuration file with one fake accessory and one fake platform. You can use this as a template for creating your own configuration file containing devices you actually own.",
-
-    "accessories": [
+{    
+   "accessories": [
        {
-       "accessory": "GarageCommand-KP-TCP-I2O2",
-       "name": "Porte de garage bis",
-       "open": "./open.sh",
-       "close": "./close.sh",
-       "state": "./check_state.sh",
-       "status_update_delay": 15,
-       "poll_state_delay": 5
-     }
+       "accessory": "GarageCommande",
+       "name": "Porte de garage",
+       "envoyerCommande": "/var/homebridge/XetKP-TCP-I2O2.pl Ecrire ContacteurPorte",
+       "lireCapteurEtatOuvert": "/var/homebridge/XetKP-TCP-I2O2.pl Lire CapteurOuvert",
+       "lireCapteurEtatFerme": "/var/homebridge/XetKP-TCP-I2O2.pl Lire CapteurFerme",
+       "delaiMouvement": 30,
+       "intervalLecture": 1
+       }
    ]
 }

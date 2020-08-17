@@ -1,0 +1,27 @@
+{
+  "name": "homebridge-CommandePorteDeGarage-TCP-KP-I2O2",
+  "version": "1.0.0",
+  "description": "Homebridge plugin gérant une porte de garage avec le module TCP-KP-I2O2",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "engines": {
+    "homebridge": ">=0.4.40",
+    "node": ">=11.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CapitaineKirk/homebridge-CommandePorteDeGarage-TCP-KP-I2O2"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "TCP-KP-I2O2",
+    "Porte de garage"
+  ],
+  "author": "Capitaine Kirk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CapitaineKirk/homebridge-CommandePorteDeGarage-TCP-KP-I2O2/issues"
+  },
+  "homepage": "https://github.com/CapitaineKirk/homebridge-CommandePorteDeGarage-TCP-KP-I2O2#readme"
+}

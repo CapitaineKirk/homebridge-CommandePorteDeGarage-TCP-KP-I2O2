@@ -64,6 +64,9 @@ function PorteDeGarageAccessory(log, config) {
       this.etatActionneurPorte = TCP_ETAT_ACTIONNEUR_2;
     break;
   }
+  this.delaiDeReaction = 1000 * (config.delaiDeReaction || 2);
+  this.delaiDeMouvement = 1000 * (config.delaiDeMouvement || 20);
+  this.delaiInterCommandes = 1000 * (config.delaiInterCommandes || 2);
   this.intervalLecture = config.intervalLecture || 1;
   this.debug = config.debug || 0;
   this.etatPorteActuel = Characteristic.CurrentDoorState.CLOSED; //Etat initial
@@ -73,6 +76,7 @@ function PorteDeGarageAccessory(log, config) {
   this.etatCapteurOuvert = false;
   this.horodatageMouvement = 0;
   this.horodatageCommande = 0;
+  this.commandeEnAttente = 0;
   this.log('Fin PorteDeGarageAccessory');
 }
 
@@ -240,7 +244,6 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
   var changeEtatActuel = false;
   var changeEtatDemande = false;
   var changeEtatObstruction = false;
-  var activerCommande = false;
 
   if(accessory.debug) {
     accessory.log('Etat demande      : ' + accessory.etatPorteDemande);
@@ -429,7 +432,6 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
   }
 
 
-  // en fonction de l'etat demande on detecte une demande d'ouverture/fermeture provenant de home
   // Pour la porte la commande est rudimentaire : une impulsion =>
   // Cas 1 : si la porte est fermee => la porte s'ouvre
   // Cas 2 : si la porte est ouverte => la porte se ferme
@@ -437,6 +439,8 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
   // Cas 4 : si la porte est en train de s'ouvrir => la porte s'arrete
   // Cas 5 : si la porte est arretee => elle s'ouvre si elle avait ete arretee en train de se fermer,
   //         ou se ferme si elle avait ete arretee en train de s'ouvrir
+
+  // en fonction de l'etat demande on detecte une demande d'ouverture/fermeture provenant de home
   switch(accessory.etatPorteDemande) {
     case Characteristic.TargetDoorState.OPEN :
       switch(accessory.etatPorteActuel) {
@@ -447,8 +451,8 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
           if(accessory.horodatageCommande == 0) {
             // Si pas aucune commande n'a ete envoyee => Cas 1 : on active la commande
             accessory.log('Etat demandé et actuel de ' + accessory.name + ' sont : (ouvert, fermé) => une implusion');
-            activerCommande = true;
-          } else if ((horodatageGestionEtat - accessory.horodatageCommande) < 2000) {
+            accessory.commandeEnAttente++;
+          } else if ((horodatageGestionEtat - accessory.horodatageCommande) < accessory.delaiDeReaction) {
             // Si une commande a deja ete envoyee depuis moins de 2 secondes, on attend
             accessory.log('Etat demandé et actuel de ' + accessory.name + ' sont : (ouvert, fermé), en attente de mouvement');
           } else {
@@ -471,12 +475,12 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
           accessory.log('Etat demandé et actuel de ' + accessory.name + ' deviennent : (ouvrir, stoppé');
           accessory.etatPorteActuel = Characteristic.CurrentDoorState.STOPPED;
           changeEtatActuel = true;
-          activerCommande = true;
+          accessory.commandeEnAttente++;
         break;
         case Characteristic.CurrentDoorState.OPENING :
           // si la demande est ferme et que la porte est en train de se fermer
           // on ne fait rien sauf si le delai est trop important
-          if ((horodatageGestionEtat - accessory.horodatageMouvement) < 20000) {
+          if ((horodatageGestionEtat - accessory.horodatageMouvement) < accessory.delaiDeMouvement) {
             if(accessory.debug) {
               accessory.log('Etat demandé et actuel de ' + accessory.name + ' sont : (ouvrir, en ouverture) => rien');
             }
@@ -505,7 +509,7 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
           accessory.log('Etat demandé et actuel de ' + accessory.name + ' deviennent : (ouvrir, en ouverture)');
           accessory.etatPorteActuel = Characteristic.CurrentDoorState.OPENING;;
           changeEtatActuel = true;
-          activerCommande = true;
+          accessory.commandeEnAttente++;
         break;
       }
     break;
@@ -518,8 +522,8 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
           if(accessory.horodatageCommande == 0) {
             // Si pas aucune commande n'a ete envoyee => Cas 1 : on active la commande
             accessory.log('Etat demandé et actuel de ' + accessory.name + ' sont : (fermé, ouvert) => une implusion');
-            activerCommande = true;
-          } else if ((horodatageGestionEtat - accessory.horodatageCommande) < 2000) {
+            accessory.commandeEnAttente++;
+          } else if ((horodatageGestionEtat - accessory.horodatageCommande) < accessory.delaiDeReaction) {
             // Si une commande a deja ete envoyee depuis moins de 2 secondes, on attend
             accessory.log('Etat demandé et actuel de ' + accessory.name + ' sont : (fermé, ouvert), en attente de mouvement');
           } else {
@@ -542,12 +546,12 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
           accessory.log('Etat demandé et actuel de ' + accessory.name + ' deviennent : (fermé, stoppé)');
           accessory.etatPorteActuel = Characteristic.CurrentDoorState.STOPPED;
           changeEtatActuel = true;
-          activerCommande = true;
+          accessory.commandeEnAttente++;
         break;
         case Characteristic.CurrentDoorState.CLOSING : 
           // si la demande est ferme et que la porte est en train de se fermer
           // on ne fait rien sauf si le delai est trop important
-          if ((horodatageGestionEtat - accessory.horodatageMouvement) < 20000) {
+          if ((horodatageGestionEtat - accessory.horodatageMouvement) < accessory.delaiDeMouvement) {
             if(accessory.debug) {
               accessory.log('Etat demandé et actuel de ' + accessory.name + ' sont : (fermé, en fermeture) => rien');
             }
@@ -575,7 +579,7 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
           accessory.log('Etat demandé et actuel de ' + accessory.name + ' sont : (fermé, stoppé) => une impulsion');
           accessory.log('Etat demandé et actuel de ' + accessory.name + ' deviennentt : (fermé, en fermeture) => une impulsion');
           accessory.etatPorteActuel = Characteristic.CurrentDoorState.CLOSING;;
-          activerCommande = true;
+          accessory.commandeEnAttente++;
         break;
       }
     break;
@@ -592,8 +596,11 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
     accessory.garageDoorService.getCharacteristic(Characteristic.ObstructionDetected).updateValue(accessory.etatPorteObstruction);
   }
 
-  if(activerCommande) {
-    if((accessory.horodatageCommande == 0) || ((horodatageGestionEtat - accessory.horodatageCommande) > 1500) ) {
+  // Chaque nouvelle demande de commande incremente le compteur commandeEnAttente afin de gérer les demandes de commande quasi simulatanées 
+  // le delai de 1,5s est vérifie avant chaque nouvel envoi de commande.
+  if(accessory.commandeEnAttente != 0) {
+    if((accessory.horodatageCommande == 0) || ((horodatageGestionEtat - accessory.horodatageCommande) > accessory.delaiInterCommandes) ) {
+      accessory.commandeEnAttente--;
       accessory.log('Commande envoyée : ' + accessory.commandeActionneurPorte);
       accessory.commandeEnCours = accessory.commandeActionneurPorte;
       try {
@@ -603,8 +610,9 @@ PorteDeGarageAccessory.prototype.gererEtat = function() {
       accessory.commandeEncours = '';
       }
     } else {
-      accessory.log('La commande envoyée, il y a ' + (horodatageGestionEtat - accessory.horodatageCommande)/1000  + ' s, pas de commande réenvoyée');
+      accessory.log('La précédente commande a été envoyée il y a ' + (horodatageGestionEtat - accessory.horodatageCommande)/1000  + ' s, pas de commande réenvoyée immédiatement');
     }
+    accessory.log('Il reste ' + accessory.commandeEnAttente + ' commande(s) en attente');
   }
 
   if(accessory.debug) {

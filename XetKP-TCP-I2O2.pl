@@ -5,7 +5,7 @@
 # Date : 02/12/2018
 #
 # But : envoyer des commandes au module KP-TCP-I2O2 dans le cadre d'une
-#  integration dans OPENHAB
+#  integration avec perl
 #
 # Parametres:
 #
@@ -29,10 +29,6 @@
 #   - si joignable, imprime OK
 #   - si pas joignable, imprime KO
 # 
-# L'integration dans OPENHAB se fait pas l'intermediaire des thing:
-# Thing exec:command:LauriersVanneScriptCommande [command="/etc/openhab2/perl/SetSR-201.pl Lauriers %2$s", transform="REGEX((.*?))", interval=0, timeout=1, autorun=true]
-# Thing exec:command:LauriersVanneScriptStatus [command="/etc/openhab2/perl/SetSR-201.pl Lauriers Status", interval=5, timeout=1]
-#
 # Protocole de commandes 
 #
 # Port de connexion : 12345

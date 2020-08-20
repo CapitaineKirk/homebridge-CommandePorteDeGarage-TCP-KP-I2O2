@@ -1,13 +1,17 @@
 {    
    "accessories": [
        {
-       "accessory": "GarageCommande",
+       "accessory": "CommandePorteDeGarage-TCP-KP-I2O2",
        "name": "Porte de garage",
-       "envoyerCommande": "/var/homebridge/XetKP-TCP-I2O2.pl Ecrire ContacteurPorte",
-       "lireCapteurEtatOuvert": "/var/homebridge/XetKP-TCP-I2O2.pl Lire CapteurOuvert",
-       "lireCapteurEtatFerme": "/var/homebridge/XetKP-TCP-I2O2.pl Lire CapteurFerme",
-       "delaiMouvement": 30,
-       "intervalLecture": 1
+       "adresseIp": "192.168.0.14",
+       "actionneurPorte": 1,
+       "capteurOuvert": 2,
+       "capteurFerme": 1,
+       "delaiDeReaction" : 2,
+       "delaiDeMouvement" : 20,
+       "delaiInterCommandes" : 2,
+       "intervalLecture": 1,
+       "debug": 0
        }
    ]
 }

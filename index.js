@@ -4,19 +4,19 @@ var net = require('net');
 
 const TCP_PORT = 12345;
 
-const TCP_CMD_CAPTEUR_1 ="AT+OCCH1=?\r\n";
-const TCP_ETAT_CAPTEUR_1_ON ="+OCCH1:1\r\n";
-const TCP_ETAT_CAPTEUR_1_OFF ="+OCCH1:0\r\n";
+const TCP_CMD_ENTREE_1 ="AT+OCCH1=?\r\n";
+const TCP_ETAT_ENTREE_1_ON ="+OCCH1:1\r\n";
+const TCP_ETAT_ENTREE_1_OFF ="+OCCH1:0\r\n";
 
-const TCP_CMD_CAPTEUR_2 ="AT+OCCH2=?\r\n";
-const TCP_ETAT_CAPTEUR_2_ON ="+OCCH2:1\r\n";
-const TCP_ETAT_CAPTEUR_2_OFF ="+OCCH2:0\r\n";
+const TCP_CMD_ENTREE_2 ="AT+OCCH2=?\r\n";
+const TCP_ETAT_ENTREE_2_ON ="+OCCH2:1\r\n";
+const TCP_ETAT_ENTREE_2_OFF ="+OCCH2:0\r\n";
 
-const TCP_CMD_ACTIONNEUR_1 ="AT+STACH1=1,1\r\n";
-const TCP_ETAT_ACTIONNEUR_1 ="OK\r\n";
+const TCP_CMD_SORTIE_1 ="AT+STACH1=1,1\r\n";
+const TCP_ETAT_SORTIE_1 ="OK\r\n";
 
-const TCP_CMD_ACTIONNEUR_2 ="AT+STACH2=1,1\r\n";
-const TCP_ETAT_ACTIONNEUR_2 ="OK\r\n";
+const TCP_CMD_SORTIE_2 ="AT+STACH2=1,1\r\n";
+const TCP_ETAT_SORTIE_2 ="OK\r\n";
 
 const TCP_TIMEOUT = 500;
 
@@ -32,36 +32,36 @@ function PorteDeGarageAccessory(log, config) {
   this.adresseIp = config.adresseIp;
   switch(config.capteurFerme) {
     case 1:
-      this.commandeCapteurFerme = TCP_CMD_CAPTEUR_1;
-      this.etatCapteurFermeOn = TCP_ETAT_CAPTEUR_1_ON;
-      this.etatCapteurFermeOff = TCP_ETAT_CAPTEUR_1_OFF;
+      this.commandeCapteurFerme = TCP_CMD_ENTREE_1;
+      this.etatCapteurFermeOn = TCP_ETAT_ENTREE_1_ON;
+      this.etatCapteurFermeOff = TCP_ETAT_ENTREE_1_OFF;
     break;
     case 2:
-      this.commandeCapteurFerme = TCP_CMD_CAPTEUR_2;
-      this.etatCapteurFermeOn = TCP_ETAT_CAPTEUR_2_ON;
-      this.etatCapteurFermeOff = TCP_ETAT_CAPTEUR_2_OFF;
+      this.commandeCapteurFerme = TCP_CMD_ENTREE_2;
+      this.etatCapteurFermeOn = TCP_ETAT_ENTREE_2_ON;
+      this.etatCapteurFermeOff = TCP_ETAT_ENTREE_2_OFF;
     break;
   }
   switch(config.capteurOuvert) {
     case 1:
-      this.commandeCapteurOuvert = TCP_CMD_CAPTEUR_1;
-      this.etatCapteurOuvertOn = TCP_ETAT_CAPTEUR_1_ON;
-      this.etatCapteurOuvertOff = TCP_ETAT_CAPTEUR_1_OFF;
+      this.commandeCapteurOuvert = TCP_CMD_ENTREE_1;
+      this.etatCapteurOuvertOn = TCP_ETAT_ENTREE_1_ON;
+      this.etatCapteurOuvertOff = TCP_ETAT_ENTREE_1_OFF;
     break;
     case 2:
-      this.commandeCapteurOuvert = TCP_CMD_CAPTEUR_2;
-      this.etatCapteurOuvertOn = TCP_ETAT_CAPTEUR_2_ON;
-      this.etatCapteurOuvertOff = TCP_ETAT_CAPTEUR_2_OFF;
+      this.commandeCapteurOuvert = TCP_CMD_ENTREE_2;
+      this.etatCapteurOuvertOn = TCP_ETAT_ENTREE_2_ON;
+      this.etatCapteurOuvertOff = TCP_ETAT_ENTREE_2_OFF;
     break;
   }
   switch(config.actionneurPorte) {
     case 1:
-      this.commandeActionneurPorte  = TCP_CMD_ACTIONNEUR_1;
-      this.etatActionneurPorte = TCP_ETAT_ACTIONNEUR_1;
+      this.commandeActionneurPorte  = TCP_CMD_SORTIE_1;
+      this.etatActionneurPorte = TCP_ETAT_SORTIE_1;
     break;
     case 2:
-      this.commandeActionneurPorte  = TCP_CMD_ACTIONNEUR_2;
-      this.etatActionneurPorte = TCP_ETAT_ACTIONNEUR_2;
+      this.commandeActionneurPorte  = TCP_CMD_SORTIE_2;
+      this.etatActionneurPorte = TCP_ETAT_SORTIE_2;
     break;
   }
   this.delaiDeReaction = 1000 * (config.delaiDeReaction || 2);
